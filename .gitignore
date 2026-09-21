@@ -218,8 +218,13 @@ __marimo__/
 .streamlit/secrets.toml
 .venv/
 data/raw/*
+!data/raw/*.dvc
+!data/raw/.gitignore
 data/processed/*
+!data/processed/.gitkeep
 models/*
+!models/.gitkeep
 !**/.gitkeep
 mlruns/
 .env
+.venv/
