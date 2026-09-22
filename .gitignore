@@ -217,9 +217,11 @@ __marimo__/
 # Streamlit
 .streamlit/secrets.toml
 .venv/
-data/raw/*
+data/raw/*.csv
 data/processed/*
 models/*
 !**/.gitkeep
 mlruns/
 .env
+!data/raw/*.dvc
+!data/raw/.gitignore
