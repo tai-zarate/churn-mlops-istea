@@ -217,7 +217,7 @@ __marimo__/
 # Streamlit
 .streamlit/secrets.toml
 .venv/
-data/raw/*
+data/raw/*.csv
 !data/raw/*.dvc
 !data/raw/.gitignore
 data/processed/*
