@@ -11,7 +11,6 @@ Predecir la probabilidad de que un cliente abandone la empresa de telecomunicaci
 - Datos versionados con DVC y almacenados en DagsHub.
 
 ## Modelo candidato
-*a partir de las metricas y los modelos usados, proponer candidato*
 - Modelo:
 - Versión:
 - Resultados métricas:
