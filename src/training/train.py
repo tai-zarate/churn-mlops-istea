@@ -44,7 +44,7 @@ from src.data.load import cargar_datos, separar_variables
 
 from src.data.split import dividir_datos
 
-from src.features.preprocessor import construir_preprocesador
+from src.features.preprocessing import construir_preprocesador
 
  
 
@@ -135,35 +135,46 @@ def main():
  
 
     modelos = {
-
+        # Piso: qué pasa si nunca predecimos churn.
         "baseline_dummy": DummyClassifier(
-
             strategy="most_frequent",
-
             random_state=42,
-
         ),
-
+        # Lineal sin compensar el desbalance 73.6/26.4.
         "logistic_regression": LogisticRegression(
-
             max_iter=1000,
-
             random_state=42,
-
         ),
-
+        # Misma lineal, pesando más la clase minoritaria: ¿sube el recall?
+        "logistic_regression_balanced": LogisticRegression(
+            max_iter=1000,
+            class_weight="balanced",
+            random_state=42,
+        ),
+        # Árbol sin compensar.
         "random_forest": RandomForestClassifier(
-
             n_estimators=300,
-
             min_samples_leaf=3,
-
             random_state=42,
-
             n_jobs=-1,
-
         ),
-
+        # Mismo árbol balanceado: ¿el efecto se repite fuera del modelo lineal?
+        "random_forest_balanced": RandomForestClassifier(
+            n_estimators=300,
+            min_samples_leaf=3,
+            class_weight="balanced",
+            random_state=42,
+            n_jobs=-1,
+        ),
+        # Árbol balanceado y menos profundo: ¿generaliza mejor con menos sobreajuste?
+        "random_forest_balanced_shallow": RandomForestClassifier(
+            n_estimators=300,
+            max_depth=8,
+            min_samples_leaf=3,
+            class_weight="balanced",
+            random_state=42,
+            n_jobs=-1,
+        ),
     }
 
  
