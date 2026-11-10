@@ -46,9 +46,11 @@ from src.data.split import dividir_datos
 
 from src.features.preprocessing import construir_preprocesador
 
- 
+import os
 
- 
+import mlflow
+import mlflow.sklearn
+from dotenv import load_dotenv
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -68,9 +70,15 @@ SCORING = {
 
     "roc_auc": "roc_auc",
 
+
 }
 
- 
+load_dotenv()
+
+EXPERIMENT_NAME = "churn-prediction"
+
+mlflow.set_tracking_uri(os.getenv("MLFLOW_TRACKING_URI", "file:./mlruns"))
+mlflow.set_experiment(EXPERIMENT_NAME)
 
  
 
@@ -196,46 +204,33 @@ def main():
  
 
     for nombre, modelo in modelos.items():
-
         pipeline = crear_pipeline(modelo)
 
- 
-
         scores = cross_validate(
-
             pipeline,
-
             X_train,
-
             y_train,
-
             cv=cv,
-
             scoring=SCORING,
-
             n_jobs=-1,
-
         )
 
- 
+        metricas_cv = {
+            "cv_precision": round(scores["test_precision"].mean(), 4),
+            "cv_recall": round(scores["test_recall"].mean(), 4),
+            "cv_f1": round(scores["test_f1"].mean(), 4),
+            "cv_roc_auc": round(scores["test_roc_auc"].mean(), 4),
+        }
 
-        resultados.append(
+        with mlflow.start_run(run_name=nombre):
+            mlflow.log_param("modelo", nombre)
+            mlflow.log_param("cv_folds", 5)
+            mlflow.log_param("test_size", 0.2)
+            mlflow.log_param("random_state", 42)
+            mlflow.log_params(modelo.get_params())
+            mlflow.log_metrics(metricas_cv)
 
-            {
-
-                "modelo": nombre,
-
-                "cv_precision": round(scores["test_precision"].mean(), 4),
-
-                "cv_recall": round(scores["test_recall"].mean(), 4),
-
-                "cv_f1": round(scores["test_f1"].mean(), 4),
-
-                "cv_roc_auc": round(scores["test_roc_auc"].mean(), 4),
-
-            }
-
-        )
+        resultados.append({"modelo": nombre, **metricas_cv})
 
  
 
@@ -296,6 +291,35 @@ def main():
     dump(pipeline_final, MODELS_DIR / "churn_model.joblib")
 
  
+    with mlflow.start_run(run_name=f"{nombre_ganador}_final"):
+        mlflow.log_param("modelo", nombre_ganador)
+        mlflow.log_param("seleccionado_por", "mayor cv_recall")
+        mlflow.log_params(modelo_ganador.get_params())
+
+        mlflow.log_metrics(
+            {
+                "test_accuracy": metricas_test["accuracy"],
+                "test_precision": metricas_test["precision"],
+                "test_recall": metricas_test["recall"],
+                "test_f1": metricas_test["f1"],
+                "test_roc_auc": metricas_test["roc_auc"],
+            }
+        )
+
+        mlflow.log_artifact(str(REPORTS_DIR / "model_comparison_cv.csv"))
+        mlflow.log_artifact(str(REPORTS_DIR / "final_test_metrics.json"))
+
+        mlflow.sklearn.log_model(
+            pipeline_final,
+            name="model",
+            registered_model_name="churn-classifier",
+            skops_trusted_types=[
+                "numpy.dtype",
+                "src.features.preprocessing.unificar_categorias",
+            ],
+        )
+
+        print("MLflow run ID:", mlflow.active_run().info.run_id)
 
     print("\nModelo seleccionado:", nombre_ganador)
 

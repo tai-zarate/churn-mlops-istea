@@ -228,3 +228,4 @@ models/*
 mlruns/
 .env
 .venv/
+reports/
