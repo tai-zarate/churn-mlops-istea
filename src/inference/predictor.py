@@ -4,6 +4,8 @@ from pathlib import Path
 import joblib
 import pandas as pd
 
+from src.features.preprocessing import COL_NUMERICAS
+
 ROOT = Path(__file__).resolve().parents[2]
 
 MODEL_PATH = Path(os.getenv("MODEL_PATH", ROOT / "models" / "churn_model.joblib"))
@@ -39,6 +41,10 @@ def cargar_modelo():
 def predecir(datos_cliente: dict) -> dict:
     modelo = cargar_modelo()
     df = pd.DataFrame([datos_cliente])
+    # Con un solo registro, un None deja la columna en dtype object y el
+    # SimpleImputer no lo reconoce como faltante: le llega NaN al estimador.
+    # Forzando float, el None pasa a ser NaN y el imputador lo completa.
+    df[COL_NUMERICAS] = df[COL_NUMERICAS].astype(float)
 
     probabilidad = float(modelo.predict_proba(df)[0, 1])
 
