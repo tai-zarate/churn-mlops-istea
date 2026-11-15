@@ -4,7 +4,7 @@ scikit-learn==1.9.1
 mlflow==3.18.0
 dagshub==0.7.3
 python-dotenv==1.2.4
-dvc==3.59.0
+dvc==3.67.1
 matplotlib==3.11.2
 seaborn==0.13.2
 PyYAML==6.0.3
