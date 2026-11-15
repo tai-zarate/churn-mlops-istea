@@ -1,0 +1,10 @@
+# Dependencias del servicio de inferencia.
+# No incluye el stack de entrenamiento (MLflow, DVC, matplotlib, pytest):
+# la imagen de la API no entrena, solo carga el pipeline y predice.
+
+fastapi==0.162.0
+uvicorn[standard]==0.54.0
+pydantic==2.14.1
+pandas==3.0.5
+numpy==2.5.3
+scikit-learn==1.9.1
