@@ -252,7 +252,7 @@ en `environment`.
 |---|---|---|
 | `MODEL_PATH` | Ruta al pipeline serializado | `models/churn_model.joblib` |
 | `MODEL_VERSION` | Versión registrada en Model Registry | `local-dev` |
-| `MLFLOW_TRACKING_URI` | Tracking server | carpeta local `mlruns/` |
+| `MLFLOW_TRACKING_URI` | Tracking server | `sqlite:///mlflow.db` |
 | `MLFLOW_TRACKING_USERNAME` | Usuario de DagsHub | — |
 | `MLFLOW_TRACKING_PASSWORD` | Token de DagsHub | — |
 
@@ -300,9 +300,15 @@ pip install -r requirements.txt
 cp .env.example .env                # completar con token propio
 ```
 
-Recuperar los datos:
+Recuperar los datos. DagsHub requiere autenticación incluso en repositorios
+públicos, así que antes hay que configurar el acceso (queda en
+`.dvc/config.local`, que no se versiona):
 
 ```bash
+dvc remote modify dagshub --local auth basic
+dvc remote modify dagshub --local user tai-zarate
+dvc remote modify dagshub --local password ddd828aa291ab93af98186a495ec7ea9386a6975
+
 dvc pull
 ```
 
