@@ -77,7 +77,7 @@ load_dotenv()
 
 EXPERIMENT_NAME = "churn-prediction"
 
-mlflow.set_tracking_uri(os.getenv("MLFLOW_TRACKING_URI", "file:./mlruns"))
+mlflow.set_tracking_uri(os.getenv("MLFLOW_TRACKING_URI", "sqlite:///mlflow.db"))
 mlflow.set_experiment(EXPERIMENT_NAME)
 
  
