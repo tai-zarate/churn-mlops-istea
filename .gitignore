@@ -229,3 +229,4 @@ mlruns/
 .env
 .venv/
 reports/
+mlflow.db
